@@ -5,6 +5,7 @@ var express = require("express");
 var app = express();
 var db = require("./model/db.js");
 var formidable = require("formidable");
+var ObjectId = require("mongodb").ObjectID;
 
 app.set("view engine","ejs");
 //静态
@@ -14,7 +15,8 @@ app.get("/",function (req,res) {
 });
 
 app.get("/du",function (req,res,next) {
-    db.find("liuyanben",{},function (err,result) {
+    var page = parseInt(req.query.page);
+    db.find("liuyanben",{},{"sort":{"shijian":-1},"pageamount":5,"page":page},function (err,result) {
         res.json({"result":result});
     })
 })
@@ -39,5 +41,16 @@ app.post("/tijiao",function (req,res,next) {
     })
 })
 
+//删除
+app.get("/shanchu",function (req,res,next) {
+    //得到参数
+    var id = req.query.id;
+    db.deleteMany("liuyanben",{"_id":ObjectId(id)},function (err, result) {
+        if(err){
+            console.log("删除失败");
+        }
+        res.redirect("/");
+    })
+})
 
 app.listen(3000);

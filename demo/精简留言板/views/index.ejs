@@ -40,12 +40,27 @@
         </form>
     <div class="alert alert-success" id="chenggong" role="alert">留言成功</div>
     <div class="alert alert-danger" id="shibai" role="alert">留言失败</div>
-
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <li>
+                <a href="#" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li data-page="1" class="active yemaanniu"><a href="#">1</a></li>
+            <li data-page="2" class="yemaanniu"><a href="#">2</a></li>
+            <li data-page="3" class="yemaanniu"><a href="#">3</a></li>
+            <li data-page="4" class="yemaanniu"><a href="#">4</a></li>
+            <li data-page="5" class="yemaanniu"><a href="#">5</a></li>
+            <li>
+                <a href="#" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
     <ul class="list-group" id="listShow">
     </ul>
-    <div id="quanbuliuyan">
-
-    </div>
 </div>
 <!--<script type="text/template" id="moban">-->
     <!--<div class="liuyanban">-->
@@ -58,20 +73,31 @@
     <script src="js/bootstrap.min.js"></script>
     <script src="js/underscore-noflect.js"></script>
 <script>
-    //ajax请求
-    $.get("/du",function (result) {
 
-        for (var i = 0;i<result.result.length;i++){
-            var html = ("<li class='list-group-item'>" +
-                            "<p>姓名："+result.result[i].xingming+"</p>" +
-                            "<p>留言："+result.result[i].liuyan+"</p>" +
-                            "<p>时间:"+result.result[i].shijian+"</p>"+
-                        "</li>");
-//            $("#listShow").prepend("<li class='list-group-item'><p>姓名："+result.result[i].xingming+"</p><p>留言："+result.result[i].liuyan+"</p></li>")
-            $("#listShow").prepend(html);
-        }
+    $(".yemaanniu").click(function () {
+        var page = parseInt($(this).attr("data-page"));
+        $(this).addClass("active").siblings().removeClass("active");
+        getData(page);
     })
+    getData(1);
 
+    //ajax请求
+    function getData(page) {
+
+        $.get("/du?page="+(page-1),function (result) {
+            $("#listShow").html("");
+            for (var i = 0;i<result.result.length;i++){
+                var html = ("<li class='list-group-item'>" +
+                                "<p>姓名："+result.result[i].xingming+"</p>" +
+                                "<p>留言："+result.result[i].liuyan+"</p>" +
+                                "<p>时间:"+result.result[i].shijian+"</p>"+
+                                "<p><a href=/shanchu?id="+result.result[i]._id+">删除</a></p>"+
+                            "</li>");
+                $("#listShow").append(html);
+            }
+        })
+
+    }
 
     //ajax提交表单
 
@@ -83,7 +109,7 @@
             if (result.result==-1){
                 $("#shibai").fadeIn();
             }else if(result.result==1){
-                var html = ("<li class='list-group-item'><p>姓名："+$("#xingming").val()+"</p><p>留言："+$("#liuyan").val()+"</p><p>时间："+new Date()+"</p></li>")
+                var html = ("<li class='list-group-item'><p>姓名："+$("#xingming").val()+"</p><p>留言："+$("#liuyan").val()+"</p><p>时间："+new Date()+"</p><p><a href='javascript:;'>删除</a></p></li>")
                 $("#chenggong").fadeIn();
                 $(html).insertBefore($("#listShow"));
                 $('#xingming').val("");
